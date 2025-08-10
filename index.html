@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Graph Problem Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .difficulty-easy {
+        color: #4ade80;
+      } /* green-400 */
+      .difficulty-medium {
+        color: #facc15;
+      } /* yellow-400 */
+      .difficulty-hard {
+        color: #f87171;
+      } /* red-400 */
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-in-out;
+      }
+      .accordion-content.open {
+        max-height: 2000px; /* Adjust as needed */
+      }
+      .strikethrough {
+        text-decoration: line-through;
+        color: #6b7280; /* gray-500 */
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-gray-200 antialiased">
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+      <!-- Header -->
+      <header class="text-center mb-8">
+        <h1 class="text-4xl sm:text-5xl font-bold text-white">
+          🧠 Graph Problem Sheet
+        </h1>
+        <p class="text-gray-400 mt-2">Sorted by Pattern + Difficulty</p>
+      </header>
+
+      <!-- Progress Bar -->
+      <div class="mb-8">
+        <div class="flex justify-between mb-1">
+          <span class="text-base font-medium text-blue-400"
+            >Overall Progress</span
+          >
+          <span class="text-sm font-medium text-blue-400" id="progress-text"
+            >0 / 0</span
+          >
+        </div>
+        <div class="w-full bg-gray-700 rounded-full h-4">
+          <div
+            id="progress-bar"
+            class="bg-blue-600 h-4 rounded-full transition-all duration-500"
+            style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Problem Categories -->
+      <div id="problem-container" class="space-y-4">
+        <!-- Categories will be injected here by JavaScript -->
+      </div>
+    </div>
+
+    <script>
+      const problemData = [
+        {
+          name: "Graph Traversal (BFS & DFS)",
+          emoji: "🔁",
+          problems: [
+            {
+              id: 733,
+              difficulty: "Easy",
+              name: "Flood Fill",
+              source: "Leetcode",
+              tags: "DFS, Grid",
+            },
+            {
+              id: 200,
+              difficulty: "Easy",
+              name: "Number of Islands",
+              source: "Leetcode",
+              tags: "BFS/DFS, Grid",
+            },
+            {
+              id: 695,
+              difficulty: "Medium",
+              name: "Max Area of Island",
+              source: "Leetcode",
+              tags: "DFS",
+            },
+            {
+              id: 463,
+              difficulty: "Medium",
+              name: "Island Perimeter",
+              source: "Leetcode",
+              tags: "DFS",
+            },
+            {
+              id: 261,
+              difficulty: "Medium",
+              name: "Graph Valid Tree",
+              source: "Leetcode",
+              tags: "DFS, Tree detection",
+            },
+            {
+              id: 133,
+              difficulty: "Medium",
+              name: "Clone Graph",
+              source: "Leetcode",
+              tags: "DFS/BFS",
+            },
+            {
+              id: 130,
+              difficulty: "Medium",
+              name: "Surrounded Regions",
+              source: "Leetcode",
+              tags: "DFS/BFS, Grid",
+            },
+            {
+              id: 675,
+              difficulty: "Hard",
+              name: "Cut Off Trees for Golf Event",
+              source: "Leetcode",
+              tags: "BFS",
+            },
+          ],
+        },
+        {
+          name: "Grid as Graph",
+          emoji: "🌊",
+          problems: [
+            {
+              id: 542,
+              difficulty: "Easy",
+              name: "01 Matrix",
+              source: "Leetcode",
+              tags: "Multi-source BFS",
+            },
+            {
+              id: 994,
+              difficulty: "Medium",
+              name: "Rotting Oranges",
+              source: "Leetcode",
+              tags: "BFS",
+            },
+            {
+              id: 286,
+              difficulty: "Medium",
+              name: "Walls and Gates",
+              source: "Leetcode",
+              tags: "BFS",
+            },
+            {
+              id: 417,
+              difficulty: "Medium",
+              name: "Pacific Atlantic Water Flow",
+              source: "Leetcode",
+              tags: "DFS, Multi-source",
+            },
+            {
+              id: 1091,
+              difficulty: "Medium",
+              name: "Shortest Path in Binary Matrix",
+              source: "Leetcode",
+              tags: "BFS",
+            },
+            {
+              id: 1631,
+              difficulty: "Medium",
+              name: "Path with Minimum Effort",
+              source: "Leetcode",
+              tags: "Dijkstra",
+            },
+            {
+              id: 778,
+              difficulty: "Hard",
+              name: "Swim in Rising Water",
+              source: "Leetcode",
+              tags: "Min-heap BFS",
+            },
+          ],
+        },
+        {
+          name: "Cycle Detection (Directed & Undirected)",
+          emoji: "🔁",
+          problems: [
+            {
+              id: 207,
+              difficulty: "Medium",
+              name: "Course Schedule",
+              source: "Leetcode",
+              tags: "DFS, Topo Sort",
+            },
+            {
+              id: 210,
+              difficulty: "Medium",
+              name: "Course Schedule II",
+              source: "Leetcode",
+              tags: "DFS, Topo Sort",
+            },
+            {
+              id: "detect-cycle-in-an-undirected-graph",
+              difficulty: "Medium",
+              name: "Detect Cycle in Undirected Graph",
+              source: "GFG",
+              tags: "DFS, Union-Find",
+            },
+            {
+              id: "detect-cycle-in-a-directed-graph",
+              difficulty: "Medium",
+              name: "Detect Cycle in Directed Graph",
+              source: "GFG",
+              tags: "DFS",
+            },
+            {
+              id: 684,
+              difficulty: "Medium",
+              name: "Redundant Connection",
+              source: "Leetcode",
+              tags: "Union-Find",
+            },
+            {
+              id: 685,
+              difficulty: "Hard",
+              name: "Redundant Connection II",
+              source: "Leetcode",
+              tags: "Union-Find, Cycle",
+            },
+          ],
+        },
+        {
+          name: "Topological Sort / Dependencies",
+          emoji: "🧮",
+          problems: [
+            {
+              id: 207,
+              difficulty: "Medium",
+              name: "Course Schedule",
+              source: "Leetcode",
+              tags: "DFS",
+            },
+            {
+              id: 210,
+              difficulty: "Medium",
+              name: "Course Schedule II",
+              source: "Leetcode",
+              tags: "Topo Sort",
+            },
+            {
+              id: 269,
+              difficulty: "Medium",
+              name: "Alien Dictionary",
+              source: "Leetcode",
+              tags: "DFS, Topo Sort",
+            },
+            {
+              id: 1136,
+              difficulty: "Hard",
+              name: "Parallel Courses",
+              source: "Leetcode",
+              tags: "Topo Sort",
+            },
+            {
+              id: 444,
+              difficulty: "Hard",
+              name: "Sequence Reconstruction",
+              source: "Leetcode",
+              tags: "Topo Sort",
+            },
+          ],
+        },
+        {
+          name: "Shortest Path (BFS, Dijkstra, Bellman-Ford)",
+          emoji: "🧭",
+          problems: [
+            {
+              id: 743,
+              difficulty: "Medium",
+              name: "Network Delay Time",
+              source: "Leetcode",
+              tags: "Dijkstra",
+            },
+            {
+              id: 490,
+              difficulty: "Medium",
+              name: "The Maze",
+              source: "Leetcode",
+              tags: "BFS",
+            },
+            {
+              id: 505,
+              difficulty: "Medium",
+              name: "The Maze II",
+              source: "Leetcode",
+              tags: "Dijkstra",
+            },
+            {
+              id: 1631,
+              difficulty: "Medium",
+              name: "Path with Minimum Effort",
+              source: "Leetcode",
+              tags: "Dijkstra",
+            },
+            {
+              id: 778,
+              difficulty: "Hard",
+              name: "Swim in Rising Water",
+              source: "Leetcode",
+              tags: "Dijkstra",
+            },
+            {
+              id: 787,
+              difficulty: "Hard",
+              name: "Cheapest Flights Within K Stops",
+              source: "Leetcode",
+              tags: "BFS, Bellman-Ford",
+            },
+          ],
+        },
+        {
+          name: "Union-Find (Disjoint Set Union)",
+          emoji: "🌐",
+          problems: [
+            {
+              id: 547,
+              difficulty: "Medium",
+              name: "Number of Provinces",
+              source: "Leetcode",
+              tags: "DFS, Union-Find",
+            },
+            {
+              id: 684,
+              difficulty: "Medium",
+              name: "Redundant Connection",
+              source: "Leetcode",
+              tags: "Union-Find",
+            },
+            {
+              id: 721,
+              difficulty: "Medium",
+              name: "Accounts Merge",
+              source: "Leetcode",
+              tags: "Union-Find",
+            },
+            {
+              id: 261,
+              difficulty: "Medium",
+              name: "Graph Valid Tree",
+              source: "Leetcode",
+              tags: "Union-Find",
+            },
+            {
+              id: 1202,
+              difficulty: "Hard",
+              name: "Smallest String With Swaps",
+              source: "Leetcode",
+              tags: "Union-Find",
+            },
+          ],
+        },
+        {
+          name: "Minimum Spanning Tree (Prim's, Kruskal's)",
+          emoji: "🌳",
+          problems: [
+            {
+              id: 1168,
+              difficulty: "Medium",
+              name: "Optimize Water Distribution in a Village",
+              source: "Leetcode",
+              tags: "Kruskal",
+            },
+            {
+              id: 1135,
+              difficulty: "Hard",
+              name: "Connecting Cities With Minimum Cost",
+              source: "Leetcode",
+              tags: "Kruskal/Prim",
+            },
+            {
+              id: 1584,
+              difficulty: "Hard",
+              name: "Minimum Cost to Connect All Points",
+              source: "Leetcode",
+              tags: "Prim’s Algorithm",
+            },
+          ],
+        },
+        {
+          name: "Misc / Hard Graph Problems",
+          emoji: "🧩",
+          problems: [
+            {
+              id: 332,
+              difficulty: "Medium",
+              name: "Reconstruct Itinerary",
+              source: "Leetcode",
+              tags: "DFS, Hierholzer’s",
+            },
+            {
+              id: 126,
+              difficulty: "Hard",
+              name: "Word Ladder II",
+              source: "Leetcode",
+              tags: "BFS, Backtracking",
+            },
+            {
+              id: 127,
+              difficulty: "Hard",
+              name: "Word Ladder",
+              source: "Leetcode",
+              tags: "BFS",
+            },
+            {
+              id: 753,
+              difficulty: "Hard",
+              name: "Cracking the Safe",
+              source: "Leetcode",
+              tags: "De Bruijn Sequence",
+            },
+            {
+              id: 1579,
+              difficulty: "Hard",
+              name: "Remove Max Number of Edges to Keep Graph Fully Traversable",
+              source: "Leetcode",
+              tags: "Union-Find",
+            },
+          ],
+        },
+      ];
+
+      const problemContainer = document.getElementById("problem-container");
+      // The completedStatus object now stores a timestamp and a solve count.
+      // Example: { "733": { timestamp: 1678886400000, count: 1 } }
+      let completedStatus = {};
+      const REVIEW_DAYS = 10;
+
+      // --- Helper Functions ---
+
+      function toKebabCase(str) {
+        return str
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "");
+      }
+
+      function getProblemUrl(problem) {
+        const problemSlug = toKebabCase(problem.name);
+        if (problem.source === "Leetcode") {
+          return `https://leetcode.com/problems/${problemSlug}/`;
+        }
+        if (problem.source === "GFG") {
+          return `https://www.geeksforgeeks.org/problems/${problem.id}/`;
+        }
+        return "#";
+      }
+
+      function loadProgress() {
+        const savedProgress = localStorage.getItem("graphProblemProgress");
+        if (savedProgress) {
+          completedStatus = JSON.parse(savedProgress);
+        }
+      }
+
+      function saveProgress() {
+        localStorage.setItem(
+          "graphProblemProgress",
+          JSON.stringify(completedStatus)
+        );
+      }
+
+      // --- UI Update Functions ---
+
+      function updateGlobalUI() {
+        const allProblems = problemData.flatMap((cat) => cat.problems);
+        const totalProblems = allProblems.length;
+        const completedProblems = Object.keys(completedStatus).length;
+
+        const percentage =
+          totalProblems > 0 ? (completedProblems / totalProblems) * 100 : 0;
+        document.getElementById("progress-bar").style.width = `${percentage}%`;
+        document.getElementById(
+          "progress-text"
+        ).textContent = `${completedProblems} / ${totalProblems}`;
+
+        problemData.forEach((category, index) => {
+          const categoryProblems = category.problems;
+          const completedInCategory = categoryProblems.filter(
+            (p) => completedStatus[p.id]
+          ).length;
+          const progressElement = document.getElementById(
+            `category-progress-${index}`
+          );
+          if (progressElement) {
+            progressElement.textContent = `${completedInCategory} / ${categoryProblems.length}`;
+          }
+        });
+      }
+
+      function updateRowUI(problemId) {
+        const row = document.getElementById(`row-${problemId}`);
+        if (!row) return;
+
+        const completionData = completedStatus[problemId];
+        const isCompleted = !!completionData;
+
+        let statusHtml = "";
+        let needsReview = false;
+
+        if (isCompleted) {
+          const daysSinceCompletion =
+            (Date.now() - completionData.timestamp) / (1000 * 60 * 60 * 24);
+          if (daysSinceCompletion >= REVIEW_DAYS) {
+            statusHtml = `<span class="bg-yellow-900 text-yellow-300 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">Review ⚠️</span>`;
+            needsReview = true;
+          } else {
+            const daysRemaining = REVIEW_DAYS - Math.floor(daysSinceCompletion);
+            statusHtml = `<span class="bg-green-900 text-green-300 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full">Solved (${daysRemaining}d left)</span>`;
+          }
+        }
+
+        // Update row styles and content
+        row.classList.toggle("bg-yellow-900/20", needsReview);
+        row
+          .querySelector(".problem-name-cell")
+          .classList.toggle("strikethrough", isCompleted);
+        row.querySelector(".status-cell").innerHTML = statusHtml;
+        row.querySelector(".count-cell").textContent = isCompleted
+          ? completionData.count
+          : "0";
+      }
+
+      // --- Main Render Function ---
+
+      function renderProblems() {
+        problemContainer.innerHTML = "";
+
+        problemData.forEach((category, categoryIndex) => {
+          const categoryDiv = document.createElement("div");
+          categoryDiv.className = "bg-gray-800 rounded-lg shadow-md";
+
+          const header = document.createElement("button");
+          header.className =
+            "w-full flex justify-between items-center p-4 sm:p-5 text-left focus:outline-none";
+          header.onclick = () => {
+            const content = document.getElementById(
+              `accordion-content-${categoryIndex}`
+            );
+            const icon = document.getElementById(
+              `accordion-icon-${categoryIndex}`
+            );
+            content.classList.toggle("open");
+            icon.classList.toggle("rotate-180");
+          };
+
+          header.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-3">${category.emoji}</span>
+                        <h2 class="text-xl font-semibold text-white">${category.name}</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="category-progress-${categoryIndex}" class="text-sm font-mono text-gray-400 mr-4">0 / ${category.problems.length}</span>
+                        <svg id="accordion-icon-${categoryIndex}" class="w-6 h-6 text-gray-400 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                `;
+
+          const content = document.createElement("div");
+          content.id = `accordion-content-${categoryIndex}`;
+          content.className = "accordion-content";
+
+          const tableContainer = document.createElement("div");
+          tableContainer.className = "overflow-x-auto p-1";
+
+          const table = document.createElement("table");
+          table.className = "min-w-full text-sm text-left text-gray-300";
+
+          table.innerHTML = `
+                    <thead class="bg-gray-700/50 text-xs text-gray-400 uppercase">
+                        <tr>
+                            <th scope="col" class="p-4 w-12 text-center">Done</th>
+                            <th scope="col" class="px-4 py-3">Difficulty</th>
+                            <th scope="col" class="px-4 py-3">Problem</th>
+                            <th scope="col" class="px-4 py-3">Status</th>
+                            <th scope="col" class="px-4 py-3 text-center">Count</th>
+                            <th scope="col" class="px-4 py-3">Source</th>
+                            <th scope="col" class="px-4 py-3">Tags</th>
+                        </tr>
+                    </thead>
+                `;
+
+          const tbody = document.createElement("tbody");
+          category.problems.forEach((problem) => {
+            const completionData = completedStatus[problem.id];
+            const isCompleted = !!completionData;
+
+            const row = document.createElement("tr");
+            row.className = `border-b border-gray-700 hover:bg-gray-700/60 transition-colors duration-200`;
+            row.id = `row-${problem.id}`;
+
+            const problemNameCell = `
+                        <a href="${getProblemUrl(
+                          problem
+                        )}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 hover:underline transition-colors duration-200">
+                            ${problem.name}
+                        </a>
+                    `;
+
+            row.innerHTML = `
+                        <td class="p-4 text-center">
+                            <input type="checkbox" data-id="${
+                              problem.id
+                            }" class="w-5 h-5 rounded bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-600" ${
+              isCompleted ? "checked" : ""
+            }>
+                        </td>
+                        <td class="px-4 py-3 font-medium difficulty-${problem.difficulty.toLowerCase()}">${
+              problem.difficulty
+            }</td>
+                        <td class="px-4 py-3 font-semibold text-white problem-name-cell">${problemNameCell}</td>
+                        <td class="px-4 py-3 status-cell"></td>
+                        <td class="px-4 py-3 text-center count-cell"></td>
+                        <td class="px-4 py-3">${problem.source}</td>
+                        <td class="px-4 py-3 text-gray-400">${problem.tags}</td>
+                    `;
+
+            tbody.appendChild(row);
+            // Update the row's initial state after adding it to the DOM
+            updateRowUI(problem.id);
+          });
+
+          table.appendChild(tbody);
+          tableContainer.appendChild(table);
+          content.appendChild(tableContainer);
+          categoryDiv.appendChild(header);
+          categoryDiv.appendChild(content);
+          problemContainer.appendChild(categoryDiv);
+        });
+
+        // Add event listeners after rendering
+        document
+          .querySelectorAll('input[type="checkbox"]')
+          .forEach((checkbox) => {
+            checkbox.addEventListener("change", (event) => {
+              const id = event.target.dataset.id;
+              const isChecked = event.target.checked;
+
+              if (isChecked) {
+                const existingData = completedStatus[id] || { count: 0 };
+                completedStatus[id] = {
+                  timestamp: Date.now(),
+                  count: existingData.count + 1,
+                };
+              } else {
+                delete completedStatus[id];
+              }
+
+              saveProgress();
+              updateRowUI(id); // Update just the specific row
+              updateGlobalUI(); // Update progress bars and category counts
+            });
+          });
+      }
+
+      // --- Initialization ---
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadProgress();
+        renderProblems();
+        updateGlobalUI();
+
+        // Open the first category by default
+        const firstContent = document.getElementById("accordion-content-0");
+        const firstIcon = document.getElementById("accordion-icon-0");
+        if (firstContent && firstIcon) {
+          firstContent.classList.add("open");
+          firstIcon.classList.add("rotate-180");
+        }
+      });
+    </script>
+  </body>
+</html>
